@@ -5,27 +5,28 @@ from tkinter.ttk import *
 
 
 class MonthButton(Frame):
-    def __init__(self, master, year, month, data=dict, **kw):
+    def __init__(self, master, year=None, month=None, data=dict, **kw):
         super().__init__(master, **kw)
-        self.configure(relief=GROOVE, border=2, padding=1)
+        self.configure(relief=GROOVE, border=1, padding=1)
 
         self.year = IntVar(value=year)
         self.month = IntVar(value=month)
         self.year_month = StringVar(
-            value=(str(self.year.get()) + "년 " + str(self.month.get()) + "월"))
+            value=(str(self.year.get()) + "년 " + str(self.month.get()) + "월")
+        )
         self.data = data
 
         self.month_font = tkinter.font.Font(size=20, weight='bold')
-        self.button_font = tkinter.font.Font(size=40, weight='bold')
+        self.button_font = tkinter.font.Font(size=42, weight='bold')
 
         self.month_label = Label(self, textvariable=self.year_month, cursor="hand2",
-                                 width=20, anchor=CENTER, font=self.month_font)
+                                 width=24, anchor=CENTER, font=self.month_font)
         self.left_button = Label(self, text="◀", anchor=CENTER, relief=RAISED, font=self.button_font)
         self.right_button = Label(self, text="▶", anchor=CENTER, relief=RAISED, font=self.button_font)
 
         # packing
         self.left_button.pack(side=LEFT, ipadx=15, padx=1, pady=1)
-        self.month_label.pack(side=LEFT, ipady=12)
+        self.month_label.pack(side=LEFT, ipady=16)
         self.right_button.pack(side=LEFT, ipadx=15, padx=1, pady=1)
 
         # binding
