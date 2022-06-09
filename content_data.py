@@ -1,6 +1,9 @@
 import datetime
 
 from bs4 import BeautifulSoup
+from selenium import webdriver
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.common.by import By
 import re
 import requests
 
@@ -16,7 +19,13 @@ SEARCH_URL = "https://search.naver.com/search.naver"
 PERIOD_RE = re.compile(r"(\d{4})\S(\d{2})\S(\d{2})\S{2}(\d{4})\S(\d{2})\S(\d{2})")
 
 content_list = []
+url = f"https://search.naver.com/search.naver?where=nexearch&sm=tab_etc&mra=bjBC&qvt=0&query={keyword}"
 
+
+def scrap_page():
+    browser = webdriver.Chrome()
+    browser.get(url)
+    html = browser.find_element(By.TAG_NAME, 'html')
 
 def request_content_data():
     global content_list
@@ -25,7 +34,6 @@ def request_content_data():
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/101.0.4951.54 Safari/537.36'
     }
     keyword = '전시회'
-    url = f"https://search.naver.com/search.naver?where=nexearch&sm=tab_etc&mra=bjBC&qvt=0&query={keyword}"
 
     r = requests.get(url, headers=headers)
     soup = BeautifulSoup(r.text, 'lxml')
@@ -66,6 +74,9 @@ def request_content_data():
         new_content['link'] = real_page_soup.select_one('div [class="main_pack"] h2 a').get('href')
 
         # reservation
+        buttons = item.find(class_='button_area').find_all('a')
+        if buttons.__len__() > 1:
+            new_content['reservation'] = buttons[0].get('href')
 
         content_list.append(new_content)
 
