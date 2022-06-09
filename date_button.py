@@ -4,10 +4,11 @@ from tkinter.ttk import *
 
 from requests import delete
 
-DAY_OF_WEEK = ('mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun')
+WEEKDAY = ('mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun')
+SELECTED_COLOR = '#d4ff00'
 
 class DateButton(Frame):
-    def __init__(self, master, date=None, month=None, dayofweek=None, running_count=None, deadline_count=None, data=dict, **kw):
+    def __init__(self, master, date=None, month=None, weekday=None, running_count=None, deadline_count=None, data=dict, **kw):
         super().__init__(master, **kw)
         self.configure(relief=RAISED, border=1, padding=1)
 
@@ -31,8 +32,8 @@ class DateButton(Frame):
         self.running_info = Label(self.info_frame, textvariable=self.deadline_count, width=9, anchor=E, foreground='green')
         self.deadline_info = Label(self.info_frame, textvariable=self.deadline_count, width=9, anchor=E, foreground='red')
 
-        if dayofweek:
-            self.set_dayofweek(dayofweek)
+        if weekday:
+            self.set_weekday(weekday)
 
         self.date_label.pack()
         self.running_info.pack()
@@ -57,8 +58,7 @@ class DateButton(Frame):
     def disable(self):
         self.configure(relief=GROOVE)
         self.date_label.configure(foreground='gray')
-        self.running_info.configure(textvariable=self.delete_text)
-        self.deadline_info.configure(textvariable=self.delete_text)
+        self.hide_info()
 
         def f(event=None):
             pass
@@ -80,8 +80,7 @@ class DateButton(Frame):
         else:
             self.date_label.configure(foreground='black')
 
-        self.running_info.configure(textvariable=self.running_count)
-        self.deadline_info.configure(textvariable=self.deadline_count)
+        self.show_info()
 
         self.date_label.bind("<Button-1>", self.pressed)
         self.date_label.bind("<ButtonRelease-1>", self.new_fn)
@@ -89,6 +88,38 @@ class DateButton(Frame):
         self.running_info.bind("<ButtonRelease-1>", self.new_fn)
         self.deadline_info.bind("<Button-1>", self.pressed)
         self.deadline_info.bind("<ButtonRelease-1>", self.new_fn)
+
+    def selected(self):
+        self.date_label.configure(background=SELECTED_COLOR)
+        self.running_info.configure(background=SELECTED_COLOR)
+        self.deadline_info.configure(background=SELECTED_COLOR)
+
+    def unselected(self):
+        self.date_label.configure(background='SystemButtonFace')
+        self.running_info.configure(background='SystemButtonFace')
+        self.deadline_info.configure(background='SystemButtonFace')
+
+    def show_info(self, mode='both'):
+        if mode == 'ri':
+            self.running_info.configure(textvariable=self.running_count)
+        elif mode == 'di':
+            self.deadline_info.configure(textvariable=self.deadline_count)
+        elif mode == 'both':
+            self.running_info.configure(textvariable=self.running_count)
+            self.deadline_info.configure(textvariable=self.deadline_count)
+        else:
+            assert mode, print(f"MODE KEYWORD ERROR: {mode}")
+
+    def hide_info(self, mode='both'):
+        if mode == 'ri':
+            self.running_info.configure(textvariable=self.delete_text)
+        elif mode == 'di':
+            self.deadline_info.configure(textvariable=self.delete_text)
+        elif mode == 'both':
+            self.running_info.configure(textvariable=self.delete_text)
+            self.deadline_info.configure(textvariable=self.delete_text)
+        else:
+            assert mode, print(f"MODE KEYWORD ERROR: {mode}")
 
     def release_bind(self, fn):
         def new_release(event=None):
@@ -101,8 +132,8 @@ class DateButton(Frame):
         self.running_info.bind("<ButtonRelease-1>", new_release)
         self.deadline_info.bind("<ButtonRelease-1>", new_release)
 
-    def set_dayofweek(self, day):
-        assert day in DAY_OF_WEEK, print(f"DAY OF WEEK error: {day}")
+    def set_weekday(self, day):
+        assert day in WEEKDAY, print(f"DAY OF WEEK error: {day}")
         self.dayofweek.set(day)
 
         if day == 'sun':
@@ -111,6 +142,7 @@ class DateButton(Frame):
             self.date_label.configure(foreground='blue')
         else:
             self.date_label.configure(foreground='black')
+
 
 
 if __name__ == '__main__':
@@ -151,6 +183,9 @@ if __name__ == '__main__':
     date2.pack(side=LEFT)
     date3.pack(side=LEFT)
     date4.pack(side=LEFT)
+
+    date1.selected()
+    date3.unselected()
 
     window.mainloop()
 
